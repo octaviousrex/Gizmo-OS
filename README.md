@@ -1,5 +1,5 @@
-# MiniOS
-MiniOS is my personal Operating System, being built with COSMOS. I will upload the project when I finish the FAT filesystem because then I think it will be presentable. The Password is 1234, but the code can be changed for a different one. See "What it does right now" for details.
+# GizmoOS
+GizmoOS is my personal Operating System, being built with COSMOS. I will upload the project when I finish the FAT filesystem because then I think it will be presentable. The Password is 1234, but the code can be changed for a different one. See "What it does right now" for details.
 
 ***Note that I am kind of an amateur with this stuff, so this may stay barebones until I get the ropes of it. I am, however, always developing it. I would always take some help :). Please file an issue under "issues" if you find something wrong with the project, or have a suggestion***
 
