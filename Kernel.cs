@@ -150,6 +150,11 @@ namespace Gizmo.Core
             {
                 Console.WriteLine("Gizmo OS 0.0.1");
             }
+
+            if (input.StartsWith("ABT"))
+            {
+                Console.WriteLine("Cosmos OS User Kit with VS19");
+            }
         }
     }
 }
