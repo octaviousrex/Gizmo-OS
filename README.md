@@ -1,3 +1,6 @@
+# I have moved this project to Gizmo OS Version 2
+
+
 # GizmoOS
 GizmoOS is my personal Operating System, being built with COSMOS. I will upload the project when I finish the FAT filesystem because then I think it will be presentable. The Password is 1234, but the code can be changed for a different one. See "What it does right now" for details.
 
