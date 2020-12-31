@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Sys = Cosmos.System;
-using System.Drawing;
 using Cosmos.System.Graphics;
+using System;
+using System.Drawing;
+using Sys = Cosmos.System;
 
 //DrawRectangle(Pen pen, int x_start, int y_start,int width, int height) draws a rectangle specified by a coordinate pair, a width, and a height with the specified pen
 
