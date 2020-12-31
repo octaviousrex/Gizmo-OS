@@ -4,7 +4,7 @@ GizmoOS is my personal Operating System, being built with COSMOS. I will upload 
 ***Note that I am kind of an amateur with this stuff, so this may stay barebones until I get the ropes of it. I am, however, always developing it. I would always take some help :). Please file an issue under "issues" if you find something wrong with the project, or have a suggestion***
 
 # What it does right now?
-So far, it has commands, for basic interaction, and it has a password (though I need to make it be able to set a password on its first boot).
+So far, it has commands, for basic interaction, and it has a password (though I need to make it be able to set a password on its first boot). It also has MIV Text Editor.
 
 # What did I use?
 I used Cosmos OS Userkit, which uses Visual Basic Studio and C# to create the kernel and OS.
@@ -20,5 +20,4 @@ Yes, you can. But I suggest that you get someone else's for now because mine is 
 # Far future plans:
 - Networking
 - Multi-threading
-- MIV Text editor
 - Snake Game
