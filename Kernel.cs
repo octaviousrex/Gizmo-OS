@@ -1,19 +1,28 @@
-﻿using Cosmos.System.Graphics;
 using System;
-using System.Drawing;
+using System.IO;
 using Sys = Cosmos.System;
+using Gizmo.ErrorHandler;
 
-//DrawRectangle(Pen pen, int x_start, int y_start,int width, int height) draws a rectangle specified by a coordinate pair, a width, and a height with the specified pen
 
-namespace gizmoguitest
+namespace Gizmo.Core
 {
     public class Kernel : Sys.Kernel
     {
+        //Inits Filesys
         Sys.FileSystem.CosmosVFS fs;
         string current_directory = "0:\\";
 
+        private string[] GetDirFadr(string adr) // Get Directories From Address
+        {
+            var dirs = Directory.GetDirectories(adr);
+            return dirs;
+        }
+
         protected override void BeforeRun()
         {
+            Console.ForegroundColor = ConsoleColor.Blue;
+
+            //Displays file info
             fs = new Sys.FileSystem.CosmosVFS();
             Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
 
@@ -31,101 +40,115 @@ namespace gizmoguitest
                 Console.WriteLine("WRONG PASSWORD. TRY AGAIN!");
                 goto E;
             }
-        }
-        //Defines the screen x and y size. Make these ints that are not in a method.
-        private static int screenX = 800;
-        private static int screenY = 640;
 
-        //Defines the pixel buffer. This will store all of the pixels you are setting until the screen is drawn
-        private static Color[] pixelBuffer = new Color[(screenX * screenY) + screenX];
-        private static Color[] pixelBufferOld = new Color[(screenX * screenY) + screenX];
-
-        //Canvas Variable
-        private static Canvas canvas = FullScreenCanvas.GetFullScreenCanvas();
-
-        //Int Method that initializes the canvas and mouse
-        public static void init()
-        {
-            canvas.Mode = new Mode(screenX, screenY, ColorDepth.ColorDepth32);
-            Cosmos.System.MouseManager.ScreenWidth = Convert.ToUInt32(screenX);
-            Cosmos.System.MouseManager.ScreenHeight = Convert.ToUInt32(screenY);
-        }
-
-        //make the first method. This one will set a pixel inside the buffer to a specific color.
-        //We will use this instead of the canvas.setPixel() method.
-        public static void setPixel(int x, int y, Color c)
-        {
-            if (x > screenX || y > screenY) return;
-            pixelBuffer[(x * y) + x] = c;
-        }
-
-        //draw the screen. This just loops through all pixels on the screen,
-        //checks if they are different from the last version,
-        // and then changes them if they are.
-        public static void drawScreen()
-        {
-            Pen pen = new Pen(Color.Orange);
-            for (int y = 0, h = screenY; y < h; y++)
-            {
-                for (int x = 0, w = screenX; x < w; x++)
-                {
-                    if (!(pixelBuffer[(y * x) + x] == pixelBufferOld[(y * y) + x]))
-                    {
-                        pen.Color = pixelBuffer[(y * screenX) + x];
-                        canvas.DrawPoint(pen, x, y);
-                    }
-                }
-            }
-            for (int i = 0, len = pixelBuffer.Length; i < len; i++)
-            {
-                pixelBuffer[i] = pixelBufferOld[i];
-            }
-        }
-
-        //cg=hange all the pixels colors
-        public static void clearScreen(Color c)
-        {
-            for (int i = 0, len = pixelBuffer.Length; i < len; i++)
-            {
-                pixelBuffer[i] = c;
-            }
-        }
-
-        public static void update()
-        {
-            clearScreen(Color.Blue);
-            setPixel(1, 1, Color.Black);
-            setPixel(1, 2, Color.Black);
-            setPixel(2, 1, Color.Black);
-            setPixel(2, 2, Color.Black);
-            setPixel(Convert.ToInt32(Cosmos.System.MouseManager.X), Convert.ToInt32(Cosmos.System.MouseManager.Y), Color.White);
-            drawScreen();
         }
 
         protected override void Run()
         {
-            try
+
+            Console.Write(current_directory + "> ");
+            string input = Console.ReadLine();
+
+            //FILE SYS DIR
+            string[] dirs = GetDirFadr(current_directory);
+
+            if (input.StartsWith("DIR"))
             {
-                canvas.Mode = new Mode(800, 600, ColorDepth.ColorDepth32);
-
-                /* A red Point */
-                Pen pen = new Pen(Color.Red);
-                canvas.DrawPoint(pen, 69, 69);
-
-                pen.Color = Color.RoyalBlue;
-                canvas.DrawFilledRectangle(pen, 0, 0, 800, 600);
-
-                Console.WriteLine("OS Booted");
-
-                Console.ReadKey();
-
-                Stop();
+                foreach (var item in dirs)
+                {
+                    Console.WriteLine(item);
+                }
             }
-            catch (Exception e)
+
+            //FILE SYS TYPE
+            if (input.StartsWith("TYPE"))
             {
-                mDebugger.Send("Exception occurred: " + e.Message);
-                mDebugger.Send(e.Message);
-                Stop();
+                string fs_type = Sys.FileSystem.VFS.VFSManager.GetFileSystemType("0:/");
+                Console.WriteLine("File System Type: " + fs_type);
+            }
+
+            var directory_list = Sys.FileSystem.VFS.VFSManager.GetDirectoryListing("0:/");
+
+            //FILE SYS READ
+            if (input.StartsWith("READ"))
+            {
+                try
+                {
+                    foreach (var directoryEntry in directory_list)
+                    {
+                        var file_stream = directoryEntry.GetFileStream();
+                        var entry_type = directoryEntry.mEntryType;
+                        if (entry_type == Sys.FileSystem.Listing.DirectoryEntryTypeEnum.File)
+                        {
+                            byte[] content = new byte[file_stream.Length];
+                            file_stream.Read(content, 0, (int)file_stream.Length);
+                            Console.WriteLine("File name: " + directoryEntry.mName);
+                            Console.WriteLine("File size: " + directoryEntry.mSize);
+                            Console.WriteLine("Content: ");
+                            foreach (char ch in content)
+                            {
+                                Console.Write(ch.ToString());
+                            }
+                            Console.WriteLine();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+            }
+
+            //FILE SYS RDFILE
+
+
+            //echo command
+            if (input.StartsWith("echo ")) { Console.WriteLine(input.Remove(0, 5)); }
+
+            //shows commands
+            if (input.StartsWith("HELP"))
+            {
+                Console.WriteLine("********COMMANDS**************************");
+                Console.WriteLine("* HELP- this menu                        *");
+                Console.WriteLine("* CLR- clears screen                     *");
+                Console.WriteLine("* REBOOT- reboots the system             *");
+                Console.WriteLine("* SHTDWN- shutdowns system               *");
+                Console.WriteLine("*                                        *");
+                Console.WriteLine("********READ******************************");
+                Console.WriteLine("* Cosmos OS- https://github.com/CosmosOS *");
+                Console.WriteLine("* ABT- about this operating system       *");
+                Console.WriteLine("******************************************");
+                Console.WriteLine("*                                        *");
+                Console.WriteLine("********SYSTEM INFO***********************");
+                Console.WriteLine("* VER- displays version info             *");
+                Console.WriteLine("******************************************");
+                Console.WriteLine("*                                        *");
+                Console.WriteLine("********FILE SYSTEM***********************");
+                Console.WriteLine("* DIR- displays files in directory       *");
+                Console.WriteLine("* TYPE- File System Type                 *");
+                Console.WriteLine("* READ- Reads all files (Non-Executables)*");
+                Console.WriteLine("******************************************");
+
+            }
+
+            if (input.StartsWith("CLR"))
+            {
+                Console.Clear();
+            }
+
+            if (input.StartsWith("REBOOT"))
+            {
+                Sys.Power.Reboot();
+            }
+
+            if (input.StartsWith("SHTDWN"))
+            {
+                Sys.Power.Shutdown();
+            }
+
+            if (input.StartsWith("VER"))
+            {
+                Console.WriteLine("Gizmo OS 0.0.1");
             }
         }
     }
